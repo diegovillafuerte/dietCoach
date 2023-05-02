@@ -1,0 +1,8 @@
+# Flask
+__pycache__/
+*.pyc
+
+# Heroku
+*.log
+*.pyc
+__pycache__/
