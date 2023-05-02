@@ -3,3 +3,6 @@ tacos con queso: None
 avocado burger: None
 a full avocado: None
 5 ox of gouda cheese: {"calories": 674,"protein": 38,"carbohydrates": 0.5,"fat": 56,"sodium": 939}
+Bottle of gatorade: The nutritional information for a bottle of Gatorade varies depending on the flavor and size of the bottle. However, on average, a 20oz bottle of fruit punch Gatorade has:
+
+{"calories": 140, "protein": 0, "carbohydrates": 36, "fat": 0, "sodium": 270}
