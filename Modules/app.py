@@ -19,11 +19,6 @@ def index():
     if request.method == "POST":
         food_description = request.form["food_description"]
         calories = get_calories(api_key, food_description)
-        print(calories)
-
-        # Save the result to a file or database
-        with open("./food_calories.txt", "a") as f:
-            f.write(f"{food_description}: {calories}\n")
 
         return render_template("index.html", food_description=food_description, calories=calories)
 
