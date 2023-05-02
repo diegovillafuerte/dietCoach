@@ -1,8 +1,6 @@
-# Flask
-__pycache__/
+venv
 *.pyc
-
-# Heroku
-*.log
-*.pyc
-__pycache__/
+staticfiles
+.env
+db.sqlite3
+getting-started/*
