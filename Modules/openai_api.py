@@ -1,5 +1,6 @@
 import openai
 import os
+import sys
 
 api_key = os.getenv("OPENAI_API_KEY")
 if api_key is None:
