@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Counter</title>
+</head>
+<body>
+    <h1>Calorie Counter</h1>
+    <form action="/" method="post">
+        <label for="food_description">Enter the food description:</label>
+        <input type="text" id="food_description" name="food_description" required>
+        <button type="submit">Calculate Calories</button>
+    </form>
+    {% if food_description %}
+        <p>{{ calories }}</p>
+    {% endif %}
+</body>
+</html>
