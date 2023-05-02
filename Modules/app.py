@@ -1,7 +1,7 @@
 import os
 import sys
-from flask import Flask, render_template, request, redirect, url_for, make_response, after_request
-from user_input import get_calories
+from flask import Flask, render_template, request, redirect, url_for, make_response
+from .user_input import get_calories
 
 app = Flask(__name__)
 
@@ -19,9 +19,10 @@ def index():
     if request.method == "POST":
         food_description = request.form["food_description"]
         calories = get_calories(api_key, food_description)
+        print(calories)
 
         # Save the result to a file or database
-        with open("food_calories.txt", "a") as f:
+        with open("./food_calories.txt", "a") as f:
             f.write(f"{food_description}: {calories}\n")
 
         return render_template("index.html", food_description=food_description, calories=calories)
