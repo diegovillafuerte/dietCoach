@@ -3,17 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calorie Counter</title>
+    <title>Nutritional tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input, button {
+            margin-bottom: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        th, td {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td:last-child {
+            display: flex;
+            justify-content: space-evenly;
+        }
+    </style>
 </head>
 <body>
-    <h1>Calorie Counter</h1>
+    <h1>Nutritional tracker</h1>
     <form action="/" method="post">
         <label for="food_description">Enter the food description:</label>
         <input type="text" id="food_description" name="food_description" required>
-        <button type="submit">Calculate Calories</button>
+        <button type="submit">Enter nutritional information</button>
     </form>
     {% if food_description %}
-        <p>{{ calories }}</p>
+        <p>Meal details: {{ meal }}</p>
+        <button>Confirm meal</button>
+        <button>Remove meal</button>
     {% endif %}
+    <table>
+        <thead>
+            <tr>
+                <th>Meal</th>
+                <th>Calories</th>
+                <th>Carbohydrates</th>
+                <th>Protein</th>
+                <th>Fat</th>
+                <th>Sodium</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Replace the following with the actual meal data -->
+            <tr>
+                <td>Example Meal</td>
+                <td>100</td>
+                <td>50</td>
+                <td>20</td>
+                <td>10</td>
+                <td>5</td>
+                <td>
+                    <button>Edit</button>
+                    <button>Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    {% if daily_summary %}<p>{{ daily_summary }}</p>{% endif %}
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Total Calories</th>
+                <th>Total Carbohydrates</th>
+                <th>Total Protein</th>
+                <th>Total Fat</th>
+                <th>Total Sodium</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Replace the following with the actual aggregate data for the last 7 days -->
+            <tr>
+                <td>2023-05-06</td>
+                <td>2000</td>
+                <td>300</td>
+                <td>150</td>
+                <td>70</td>
+                <td>2000</td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>
