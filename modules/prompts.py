@@ -13,10 +13,11 @@ def get_nutritional_info(food_description):
         {
             "role": "user",
             "content": (
-                "Give me your best estimate of the nutrional values of a salad that consist of two cups"
-                " of lettuce, one large serving spoon of hummus, and a cup of grilled chicken breast."
-                " Provide your best estimate answer in JSON format with the following keys: calories,"
-                " carbohydrates, protein, fat, sodium."
+                f"Generate your best estimate of the nutrional values of the meal description"
+                f" delimited by ---. Provide your best estimate answer in JSON format with the following"
+                f" keys: calories, carbohydrates, protein, fat, sodium.\n--- a salad that consist of two cups of lettuce, one large serving spoon of hummus, and a cup of grilled chicken breast ---\n"
+                f" If the delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
+                f" then simply return the JSON with all values equal to 0."
             ),
         },
         {
@@ -32,9 +33,25 @@ def get_nutritional_info(food_description):
             "content": (
                 f"Generate your best estimate of the nutrional values of the meal description"
                 f" delimited by ---. Provide your best estimate answer in JSON format with the following"
-                f" keys: calories, carbohydrates, protein, fat, sodium.\n---{food_description}---\n"
-                f" If the delimited by --- does not contain a meal you can understand, \\ \n"
-                f" then simply return the JSON with all values equal 0."
+                f" keys: calories, carbohydrates, protein, fat, sodium.\n--- What is the size of manhattan? ---\n"
+                f" If the delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
+                f" then simply return the JSON with all values equal to 0."
+            ),
+        },
+        {
+            "role": "assistant",
+            "content": (
+                '{"meal": 0, "calories": 0, "carbohydrates": 0, "protein": 0, "fat": 0, "sodium": 0}'
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Generate your best estimate of the nutrional values of the meal description"
+                f" delimited by ---. Provide your best estimate answer in JSON format with the following"
+                f" keys: calories, carbohydrates, protein, fat, sodium.\n--- {food_description} ---\n"
+                f" If the delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
+                f" then simply return the JSON with all values equal to 0."
             ),
         },
     ]    
