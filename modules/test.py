@@ -6,4 +6,5 @@ cursor = conn.cursor()
 cursor.execute('''SELECT * FROM meals''')
 print(cursor.fetchall())
 conn.close()
- 
+
+
