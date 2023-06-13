@@ -14,7 +14,7 @@ app.secret_key = os.getenv("SECRET_KEY")
 
 @app.route("/", methods=["GET"])
 def index():
-    if 'username' not in session:
+    if 'email' not in session:
         return redirect('/login')
     return redirect('/welcome')
 
@@ -23,8 +23,8 @@ def login():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-        session = DBSession()
-        user = session.query(User).filter_by(email=email).first()        
+        db_Session = DBSession()
+        user = db_Session.query(User).filter_by(email=email).first()        
         if user and pbkdf2_sha256.verify(password, user.password_hash):
             session['email'] = email
             return redirect('/welcome')

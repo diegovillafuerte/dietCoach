@@ -55,6 +55,5 @@ def get_nutritional_info(food_description):
             ),
         },
     ]    
-    print(prompt)
     response = chat_with_gpt(prompt, temperature=0)
     return response
