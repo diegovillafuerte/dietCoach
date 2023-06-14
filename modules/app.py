@@ -3,10 +3,11 @@ import sys
 from flask import Flask, request, render_template, redirect, session, g
 from .prompts import get_nutritional_info
 from datetime import datetime
-from .dbOperations import create_connection, close_connection, add_meal, get_daily_meal_summary
+from .dbOperations import create_connection, close_connection, add_meals, get_daily_total, todays_meals, delete_meals
 import json
 from .dbOperations import DBSession, User, Meal
 from passlib.hash import pbkdf2_sha256
+import flash
 
 
 app = Flask(__name__)
@@ -39,7 +40,9 @@ def welcome():
         return redirect('/login')
     else:
         user_email = session['email']
-        return render_template('welcome.html', email=user_email)
+        todaysMeals = todays_meals(g.conn, user_email)
+        dailyTotal = get_daily_total(g.conn, user_email)       
+        return render_template('welcome.html', email=user_email, today_meals = todaysMeals, dailyTotal=dailyTotal)
 
 @app.route("/get_info", methods=["POST"])
 def get_info():
@@ -53,8 +56,11 @@ def get_info():
     # Store the food description and nutritional info in session
     session['food_description'] = food_description
     session['nutritional_info'] = nutritional_info
+    user_email = session['email']
+    todaysMeals = todays_meals(g.conn, user_email)
+    dailyTotal = get_daily_total(g.conn, user_email) 
 
-    return render_template('welcome.html',email=session['email'], nutritional_info=nutritional_info, food_description=food_description)
+    return render_template('welcome.html',email=session['email'], nutritional_info=nutritional_info, food_description=food_description, today_meals = todaysMeals, dailyTotal=dailyTotal)
 
 
 @app.route("/add_meal", methods=["POST"])
@@ -79,17 +85,39 @@ def add_meal():
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'user_email': session['email']
     }
-    add_meal(g.conn, meal)
+    add_meals(g.conn, meal)
 
     # Clear the food description and nutritional info from session
     session.pop('food_description', None)
     session.pop('nutritional_info', None)
 
-    # Get the sum of all meal attributes for the current day
-    meals_sum = get_daily_meal_summary(g.conn, current_date, session['email'])
-    daily_summary = f"Total calories: {meals_sum[0]}, Total carbohydrates: {meals_sum[1]}, Total protein: {meals_sum[2]}, Total fat: {meals_sum[3]}, Total sodium: {meals_sum[4]}"
+    # Get todays meal summary
+    user_email = session['email']
+    todaysMeals = todays_meals(g.conn, user_email)
+    dailyTotal = get_daily_total(g.conn, user_email) 
 
-    return render_template('welcome.html', daily_summary=daily_summary)
+    # Redirect to welcome page
+    return render_template('welcome.html', today_meals = todaysMeals, dailyTotal=dailyTotal)
+
+@app.route("/deleteMeal/<int:meal_id>", methods=["GET"])
+def delete_Meal(meal_id):
+    """
+    Deletes the meal with the specified ID from the database.
+
+    Args:
+        meal_id: ID of the meal to delete.
+
+    Returns:
+        A redirect to the home page.
+    """
+    try:
+        delete_meals(g.conn, meal_id)
+    except ValueError as e:
+        print(e) 
+    user_email = session['email']
+    todaysMeals = todays_meals(g.conn, user_email)
+    dailyTotal = get_daily_total(g.conn, user_email)       
+    return render_template('welcome.html', email=user_email, today_meals = todaysMeals, dailyTotal=dailyTotal)
 
     
 @app.route("/logout", methods=["GET"])

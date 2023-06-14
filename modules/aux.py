@@ -1,6 +1,8 @@
-from dbOperations import Base, User, create_connection, add_user, remove_user
+from dbOperations import Base, User, create_connection, add_meals
+from datetime import date
 
-session = create_connection()
+
+dbsession = create_connection()
 
 user = {
     'email': 'diego.villafuerte.soraiz@gmail.com',
@@ -13,6 +15,6 @@ user = {
     'gender': 'male'
 }
 
-new_user = add_user(session, user)
 
-print(f"Added user with email: {new_user}")
+'''new_user = add_user(dbsession, user)
+print(f"Added user with email: {new_user}")'''

@@ -1,75 +1,133 @@
-{% extends 'layout.html' %}
-{% block content %}
-<body>
-    <div class="logout-form">
+{% extends 'layout.html' %}  
+
+{% block currentmeal %}  
+<div class="container">  
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Nutritional tracker</h1>
         <form action="/logout" method="get">
-            <button type="submit">Logout</button>
+          <button type="submit" class="btn btn-primary">Logout</button>
         </form>
     </div>
-    <h1>Nutritional tracker</h1>
-    <form action="/get_info" method="post">
-        <label for="food_description">Enter the meal description:</label>
-        <input type="text" id="food_description" name="food_description" required>
-        <button type="submit">Get nutritional information</button>
-    </form>
-    {% if food_description %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Meal</th>
-                    <th>Calories</th>
-                    <th>Carbohydrates</th>
-                    <th>Protein</th>
-                    <th>Fat</th>
-                    <th>Sodium</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Replace the following with the actual meal data -->
-                <tr>
-                    <td>{{ food_description }}</td>
-                    <td>{{ nutritional_info['calories'] }}</td>
-                    <td>{{ nutritional_info['carbohydrates']  }}</td>
-                    <td>{{ nutritional_info['protein']  }}</td>
-                    <td>{{ nutritional_info['fat']  }}</td>
-                    <td>{{ nutritional_info['sodium']  }}</td>
-                    <td>
-                        <form action="/add_meal" method="post">
-                            <button type="submit">Save</button>
-                        </form>
-                        <form action="/welcome" method="get">
-                            <button type="submit">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    {% endif %}
 
-    {% if daily_summary %}<p>{{ daily_summary }}</p>{% endif %}
-    <table>
+  <form action="/get_info" method="post" class="card">  
+    <div class="card-header">  
+      <h4>Enter the meal description:</h4>
+    </div>  
+    <div class="card-body">  
+      <input type="text" id="food_description" name="food_description" required>  
+      <button type="submit" class="btn btn-primary">Get nutritional information</button>  
+    </div>
+  </form>  
+
+  {% if food_description %}  
+  <div class="card" style="margin-top: 20px;">
+    <div class="card-header">  
+      <h4>Meal Information</h4>
+    </div>  
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>  
+              <th>Meal</th>  
+              <th>Calories</th>  
+              <th>Carbohydrates</th>  
+              <th>Protein</th>  
+              <th>Fat</th>  
+              <th>Sodium</th>  
+              <th>Actions</th>  
+            </tr>  
+          </thead>  
+          <tbody>  
+            <tr>  
+              <td>{{ food_description }}</td>  
+              <td>{{ nutritional_info['calories'] }}</td>  
+              <td>{{ nutritional_info['carbohydrates'] }}</td>  
+              <td>{{ nutritional_info['protein'] }}</td>  
+              <td>{{ nutritional_info['fat'] }}</td>  
+              <td>{{ nutritional_info['sodium'] }}</td>  
+              <td>
+                <div class="d-flex justify-content-around">
+                  <form action="/add_meal" method="post">  
+                    <button type="submit" class="btn btn-primary">Save</button>  
+                  </form>  
+                  <form action="/delete_meal" method="post">  
+                    <button type="submit" class="btn btn-danger">Delete</button>  
+                  </form>
+                </div>
+              </td>  
+            </tr>  
+          </tbody>  
+        </table>  
+    </div>
+      
+  </div>
+  {% endif %}  
+
+  {% if daily_summary %}
+  <div class="card">
+    <div class="card-header">  
+      <h4>Daily Summary</h4>
+    </div>  
+    <div class="card-body">
+      <p>{{ daily_summary }}</p>
+    </div>
+  </div>
+  {% endif %}  
+</div>  
+{% endblock %}
+
+{% block todaysmeals %}
+{% if today_meals %}
+<div class="container" style="margin-top: 60px">
+    <div class="card mt-3" >
+    <div class="card-header">
+        <h4>Today's Meals</h4>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped table-hover">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Total Calories</th>
-                <th>Total Carbohydrates</th>
-                <th>Total Protein</th>
-                <th>Total Fat</th>
-                <th>Total Sodium</th>
+            <th>Meal</th>
+            <th>Calories</th>
+            <th>Carbohydrates</th>
+            <th>Protein</th>
+            <th>Fat</th>
+            <th>Sodium</th>
+            <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Replace the following with the actual aggregate data for the last 7 days -->
+            {% for meal in today_meals %}
             <tr>
-                <td>2023-05-06</td>
-                <td>2000</td>
-                <td>300</td>
-                <td>150</td>
-                <td>70</td>
-                <td>2000</td>
+            <td>{{ meal['meal'] }}</td>
+            <td>{{ meal['calories'] }}</td>
+            <td>{{ meal['carbohydrates'] }}</td>
+            <td>{{ meal['protein'] }}</td>
+            <td>{{ meal['fat'] }}</td>
+            <td>{{ meal['sodium'] }}</td>
+            <td>
+                <div class="d-flex justify-content-around">
+                <form action="/deleteMeal/{{ meal.id }}" method="get">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+                </div>
+            </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td>Total</td>
+                <td>{{ dailyTotal['calories'] }}</td>
+                <td>{{ dailyTotal['carbohydrates'] }}</td>
+                <td>{{ dailyTotal['protein'] }}</td>
+                <td>{{ dailyTotal['fat'] }}</td>
+                <td>{{ dailyTotal['sodium'] }}</td>
+                <td></td>
             </tr>
         </tbody>
-    </table>
-</body>
+        </table>
+    </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

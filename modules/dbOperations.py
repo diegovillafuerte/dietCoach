@@ -2,6 +2,8 @@ from sqlalchemy import create_engine, Column, Integer, String, DateTime, Foreign
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os
 from passlib.hash import pbkdf2_sha256
+from datetime import date
+
 
 DATABASE_URL = os.environ['DATABASE_URL']
 engine = create_engine(DATABASE_URL)
@@ -29,10 +31,10 @@ class Meal(Base):
     user = relationship('User', back_populates="meals")
 
     def __repr__(self):
-        return f"<Meal(id={self.id}, meal='{self.meal}', calories={self.calories}, carbohydrates={self.carbohydrates}, protein={self.protein}, fat={self.fat}, sodium={self.sodium}, date={self.date}, user_email='{self.user_email})>"
+        return [self.id, self.meal, self.calories, self.carbohydrates, self.protein, self.fat, self.sodium, self.date, self.user_email]
 
 
-def add_meal(DBSession, meal):
+def add_meals(DBSession, meal):
     new_meal = Meal(
         meal=meal['meal'],
         calories=meal['calories'],
@@ -47,15 +49,86 @@ def add_meal(DBSession, meal):
     DBSession.commit()
     return new_meal.id
 
-def get_daily_meal_summary(DBSession, date_str, user_email):
+def delete_meals(DBSession, meal_id):
+    """
+    Deletes the meal with the specified ID from the database.
+
+    Args:
+        DBSession: SQLAlchemy session object.
+        meal_id: ID of the meal to delete.
+
+    Returns:
+        None.
+    """
+    meal = DBSession.query(Meal).filter(Meal.id == meal_id).first()
+    if meal:
+        DBSession.delete(meal)
+        DBSession.commit()
+    else:
+        raise ValueError(f"No meal found with ID {meal_id}")
+
+def todays_meals(DBSession, user_email):
+    """
+    Returns a list of meals for the current day for the specified user.
+
+    Args:
+        DBSession: SQLAlchemy session object.
+        user_email: Email of the user.
+
+    Returns:
+        A list of dictionaries representing the meals for the current day for the specified user.
+    """
+    today = date.today()
+    meals = DBSession.query(Meal).filter(
+        Meal.user_email == user_email,
+        func.date(Meal.date) == today
+    ).all()
+    meal_list = []
+    for meal in meals:
+        meal_dict = {
+            'id': meal.id,
+            'meal': meal.meal,
+            'calories': meal.calories,
+            'carbohydrates': meal.carbohydrates,
+            'protein': meal.protein,
+            'fat': meal.fat,
+            'sodium': meal.sodium,
+            'date': meal.date,
+            'user_email': meal.user_email
+        }
+        meal_list.append(meal_dict)
+    return meal_list
+
+
+
+def get_daily_total(DBSession, user_email):
+    """
+    Returns the total nutritional values for all meals for the specified date and user.
+
+    Args:
+        DBSession: SQLAlchemy session object.
+        date_str: Date string in the format 'YYYY-MM-DD'.
+        user_email: Email of the user.
+
+    Returns:
+        A list of total nutritional values for all meals for the specified date and user.
+    """
+    today = date.today()
     result = DBSession.query(
         func.sum(Meal.calories).label('total_calories'),
         func.sum(Meal.carbohydrates).label('total_carbohydrates'),
         func.sum(Meal.protein).label('total_protein'),
         func.sum(Meal.fat).label('total_fat'),
         func.sum(Meal.sodium).label('total_sodium')
-    ).filter(func.date(Meal.date) == date_str, Meal.user_email == user_email).first()
-    return result
+    ).filter(func.date(Meal.date) == today, Meal.user_email == user_email).first()
+    total_dic = {
+            'calories': result.total_calories,
+            'carbohydrates': result.total_carbohydrates,
+            'protein': result.total_protein,
+            'fat': result.total_fat,
+            'sodium': result.total_sodium,
+        }
+    return total_dic
 
 class User(Base):
     __tablename__ = 'users'
