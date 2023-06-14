@@ -6,7 +6,7 @@ api_key = os.getenv("OPENAI_API_KEY")
 if api_key is None:
     sys.exit("Error: OPENAI_API_KEY environment variable not set.")
 
-def chat_with_gpt(prompt, model="gpt-3.5-turbo", temperature=0):
+def chat_with_gpt(prompt, model="gpt-3.5-turbo-0613", temperature=0):
     response = openai.ChatCompletion.create(
         model=model,
         messages=prompt,

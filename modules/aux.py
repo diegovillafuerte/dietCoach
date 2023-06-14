@@ -1,20 +1,20 @@
-from dbOperations import Base, User, create_connection, add_meals
+from dbOperations import Base, User, create_connection, add_user
 from datetime import date
 
 
 dbsession = create_connection()
 
 user = {
-    'email': 'diego.villafuerte.soraiz@gmail.com',
-    'name': 'Diego Villafuerte Soraiz',
+    'email': 'jsilvala@chicagobooth.edu',
+    'name': 'Juan Carlos Silva',
     'password': '12345678',
-    'birthdate': '1993-10-05 00:00:00',
-    'weight': 83,
+    'birthdate': '1994-10-10 00:00:00',
+    'weight': 65,
     'height': 170,
-    'weight_goal': 68,
+    'weight_goal': 61,
     'gender': 'male'
 }
 
 
-'''new_user = add_user(dbsession, user)
-print(f"Added user with email: {new_user}")'''
+new_user = add_user(dbsession, user)
+print(f"Added user with email: {new_user}")
