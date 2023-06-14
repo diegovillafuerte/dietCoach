@@ -32,42 +32,65 @@ def login():
             return render_template('login.html', error="Invalid E-Mail or password")
     else:
         return render_template('login.html')
-
-@app.route("/welcome", methods=["GET", "POST"])
-def welcome_route():
-    if request.method == "POST":
-        food_description = request.form["food_description"]
-        nut_info= get_nutritional_info(food_description)
-        try:
-            nutritional_info = json.loads(nut_info)
-        except json.JSONDecodeError:
-            return render_template('welcome.html', error="Error: Your query was not understood. Please try again.")
-        calories = nutritional_info['calories']
-        carbohydrates = nutritional_info['carbohydrates']
-        protein = nutritional_info['protein']
-        fat = nutritional_info['fat']
-        sodium = nutritional_info['sodium']
-
-        # Add the new meal to the database
-        current_date = datetime.now().strftime("%Y-%m-%d")
-        meal = {
-            'meal': food_description,
-            'calories': calories,
-            'carbohydrates': carbohydrates,  # Replace with actual value
-            'protein': protein,        # Replace with actual value
-            'fat': fat,            # Replace with actual value
-            'sodium': sodium,         # Replace with actual value
-            'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'user_email': session['email']
-        }
-        add_meal(g.conn, meal)
-
-        # Get the sum of all meal attributes for the current day
-        meals_sum = get_daily_meal_summary(g.conn, current_date, session['email'])
-        daily_summary = f"Total calories: {meals_sum[0]}, Total carbohydrates: {meals_sum[1]}, Total protein: {meals_sum[2]}, Total fat: {meals_sum[3]}, Total sodium: {meals_sum[4]}"
-        return render_template('welcome.html', daily_summary=daily_summary)
+    
+@app.route("/welcome", methods=["GET"])
+def welcome():
+    if 'email' not in session:
+        return redirect('/login')
     else:
-        return render_template('welcome.html', daily_summary="")
+        user_email = session['email']
+        return render_template('welcome.html', email=user_email)
+
+@app.route("/get_info", methods=["POST"])
+def get_info():
+    food_description = request.form["food_description"]
+    nut_info = get_nutritional_info(food_description)
+    try:
+        nutritional_info = json.loads(nut_info)
+    except json.JSONDecodeError:
+        return render_template('welcome.html', error="Error: Your query was not understood. Please try again.")
+
+    # Store the food description and nutritional info in session
+    session['food_description'] = food_description
+    session['nutritional_info'] = nutritional_info
+
+    return render_template('welcome.html',email=session['email'], nutritional_info=nutritional_info, food_description=food_description)
+
+
+@app.route("/add_meal", methods=["POST"])
+def add_meal():
+    # Retrieve the food description and nutritional info from session
+    food_description = session.get('food_description')
+    nutritional_info = session.get('nutritional_info')
+
+    # If the food description or nutritional info are not found in session, redirect to welcome page
+    if not food_description or not nutritional_info:
+        return redirect('/welcome')
+
+    # Add the new meal to the database
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    meal = {
+        'meal': food_description,
+        'calories': nutritional_info['calories'],
+        'carbohydrates': nutritional_info['carbohydrates'],
+        'protein': nutritional_info['protein'],
+        'fat': nutritional_info['fat'],
+        'sodium': nutritional_info['sodium'],
+        'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'user_email': session['email']
+    }
+    add_meal(g.conn, meal)
+
+    # Clear the food description and nutritional info from session
+    session.pop('food_description', None)
+    session.pop('nutritional_info', None)
+
+    # Get the sum of all meal attributes for the current day
+    meals_sum = get_daily_meal_summary(g.conn, current_date, session['email'])
+    daily_summary = f"Total calories: {meals_sum[0]}, Total carbohydrates: {meals_sum[1]}, Total protein: {meals_sum[2]}, Total fat: {meals_sum[3]}, Total sodium: {meals_sum[4]}"
+
+    return render_template('welcome.html', daily_summary=daily_summary)
+
     
 @app.route("/logout", methods=["GET"])
 def logout():

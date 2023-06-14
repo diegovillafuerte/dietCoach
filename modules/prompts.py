@@ -16,7 +16,7 @@ def get_nutritional_info(food_description):
                 f"Generate your best estimate of the nutrional values of the meal description"
                 f" delimited by ---. Provide your best estimate answer in JSON format with the following"
                 f" keys: calories, carbohydrates, protein, fat, sodium.\n--- a salad that consist of two cups of lettuce, one large serving spoon of hummus, and a cup of grilled chicken breast ---\n"
-                f" If the delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
+                f" If the text delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
                 f" then simply return the JSON with all values equal to 0."
             ),
         },
@@ -34,7 +34,7 @@ def get_nutritional_info(food_description):
                 f"Generate your best estimate of the nutrional values of the meal description"
                 f" delimited by ---. Provide your best estimate answer in JSON format with the following"
                 f" keys: calories, carbohydrates, protein, fat, sodium.\n--- What is the size of manhattan? ---\n"
-                f" If the delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
+                f" If the text delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
                 f" then simply return the JSON with all values equal to 0."
             ),
         },
@@ -50,10 +50,10 @@ def get_nutritional_info(food_description):
                 f"Generate your best estimate of the nutrional values of the meal description"
                 f" delimited by ---. Provide your best estimate answer in JSON format with the following"
                 f" keys: calories, carbohydrates, protein, fat, sodium.\n--- {food_description} ---\n"
-                f" If the delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
+                f" If the text delimited by --- does not contain a meal for which you can calculate the nutritional information, \\ \n"
                 f" then simply return the JSON with all values equal to 0."
             ),
         },
     ]    
-    response = chat_with_gpt(prompt, temperature=0)
+    response = chat_with_gpt(prompt, temperature=.6)
     return response
