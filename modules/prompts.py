@@ -1,4 +1,4 @@
-from openai_api import chat_with_gpt
+from .openai_api import chat_with_gpt
 import json
 import jsonschema
 
