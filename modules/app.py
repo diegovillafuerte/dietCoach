@@ -1,13 +1,11 @@
 import os
 import sys
-from flask import Flask, request, render_template, redirect, session, g
+from flask import Flask, request, render_template, redirect, session, g, flash
 from .prompts import get_nutritional_info
 from datetime import datetime
 from .dbOperations import create_connection, close_connection, add_meals, get_daily_total, todays_meals, delete_meals
-import json
 from .dbOperations import DBSession, User, Meal
 from passlib.hash import pbkdf2_sha256
-import flash
 
 
 app = Flask(__name__)
@@ -47,18 +45,17 @@ def welcome():
 @app.route("/get_info", methods=["POST"])
 def get_info():
     food_description = request.form["food_description"]
-    nut_info = get_nutritional_info(food_description)
-    try:
-        nutritional_info = json.loads(nut_info)
-    except json.JSONDecodeError:
-        return render_template('welcome.html', error="Error: Your query was not understood. Please try again.")
-
-    # Store the food description and nutritional info in session
-    session['food_description'] = food_description
-    session['nutritional_info'] = nutritional_info
+    nutritional_info = get_nutritional_info(food_description)
     user_email = session['email']
     todaysMeals = todays_meals(g.conn, user_email)
     dailyTotal = get_daily_total(g.conn, user_email) 
+    if nutritional_info['calories'] == 'error':
+        flash("Error: Your query was not understood. Please try again.")
+        return render_template('welcome.html', today_meals = todaysMeals, dailyTotal=dailyTotal, error="Error: Your query was not understood. Please try again.")
+        
+    # Store the food description and nutritional info in session
+    session['food_description'] = food_description
+    session['nutritional_info'] = nutritional_info
 
     return render_template('welcome.html',email=session['email'], nutritional_info=nutritional_info, food_description=food_description, today_meals = todaysMeals, dailyTotal=dailyTotal)
 
@@ -82,6 +79,7 @@ def add_meal():
         'protein': nutritional_info['protein'],
         'fat': nutritional_info['fat'],
         'sodium': nutritional_info['sodium'],
+        'explanation': nutritional_info['explanation'],
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'user_email': session['email']
     }

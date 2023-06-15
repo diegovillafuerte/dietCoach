@@ -29,6 +29,7 @@ class Meal(Base):
     fat = Column(Integer)
     sodium = Column(Integer)
     date = Column(DateTime, nullable=False)
+    explanation = Column(String)
     user_email = Column(String, ForeignKey('users.email'))
     user = relationship('User', back_populates="meals")
 
@@ -45,6 +46,7 @@ def add_meals(DBSession, meal):
         fat=meal['fat'],
         sodium=meal['sodium'],
         date=meal['date'],
+        explanation=meal['explanation'],
         user_email=meal['user_email']
     )
     DBSession.add(new_meal)
@@ -96,7 +98,8 @@ def todays_meals(DBSession, user_email):
             'fat': meal.fat,
             'sodium': meal.sodium,
             'date': meal.date,
-            'user_email': meal.user_email
+            'user_email': meal.user_email,
+            'explanation': meal.explanation
         }
         meal_list.append(meal_dict)
     return meal_list

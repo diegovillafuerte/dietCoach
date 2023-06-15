@@ -71,8 +71,9 @@ def get_nutritional_info(prompt):
     response = get_nutritional_json(long_answer)
     if is_valid_json(response):
         json_data = json.loads(response)
+        json_data['explanation'] = long_answer
     else:
-        json_data = json.loads('{"calories": 0, "carbohydrates": 0, "protein": 0, "fat": 0, "sodium": 0}')
+        json_data = json.loads('{"calories": "error", "carbohydrates": 0, "protein": 0, "fat": 0, "sodium": 0}')
     return json_data
 
     

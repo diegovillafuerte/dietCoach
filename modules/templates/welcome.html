@@ -19,7 +19,7 @@
     </div>
   </form>  
 
-  {% if food_description %}  
+{% if food_description %}  
   <div class="card" style="margin-top: 20px;">
     <div class="card-header">  
       <h4>Meal Information</h4>
@@ -53,15 +53,22 @@
                   <form action="/delete_meal" method="post">  
                     <button type="submit" class="btn btn-danger">Delete</button>  
                   </form>
+                  <button class="btn btn-info toggleExplanation">See detailed explanation</button>
                 </div>
               </td>  
             </tr>  
+            <tr class="explanationRow" style="display: none;">
+              <td colspan="7">{{ nutritional_info['explanation'] }}</td>
+            </tr>
+            
           </tbody>  
         </table>  
     </div>
-      
   </div>
-  {% endif %}  
+  
+{% endif %}
+
+ 
 
   {% if daily_summary %}
   <div class="card">
@@ -98,7 +105,7 @@
         </thead>
         <tbody>
             {% for meal in today_meals %}
-            <tr>
+            <tr style="margin-top: 20px">
             <td>{{ meal['meal'] }}</td>
             <td>{{ meal['calories'] }}</td>
             <td>{{ meal['carbohydrates'] }}</td>
@@ -107,12 +114,19 @@
             <td>{{ meal['sodium'] }}</td>
             <td>
                 <div class="d-flex justify-content-around">
-                <form action="/deleteMeal/{{ meal.id }}" method="get">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
+                    <form action="/deleteMeal/{{ meal.id }}" method="get">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                    <button type="button" class="btn btn-primary toggleExplanation_history" data-target="#explanation_{{ meal.id }}">
+                        Detailed explanation
+                    </button>
                 </div>
             </td>
-            </tr>
+        </tr>
+        <tr class="explanationRow_history" id="explanation_{{ meal.id }}" style="display: none;">
+            <td colspan="7">{{ meal['explanation'] }}</td>
+        </tr>
+            
             {% endfor %}
             <tr>
                 <td>Total</td>
@@ -129,5 +143,18 @@
     </div>
 </div>
 {% endif %}
+
+<script>
+    jQuery(document).ready(function() {
+    jQuery(document).on('click', '.toggleExplanation', function() {
+        jQuery(this).closest('tr').next('.explanationRow').toggle();
+    });
+
+    jQuery(document).on('click', '.toggleExplanation_history', function() {
+        jQuery(this).closest('tr').next('.explanationRow_history').toggle();
+    });
+});
+
+</script>
 
 {% endblock %}
