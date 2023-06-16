@@ -28,18 +28,6 @@ def get_extensive_info(food_description):
         {
             "role": "user",
             "content": (
-                f"Extract ONLY the JSON from your previous answer. Make sure to leave out any units or other text and if any value is expressed in ranges use the midpoint"
-            ),
-        },
-        {
-            "role": "assistant",
-            "content": (
-                '{"calories": 315, "carbohydrates": 4, "protein": 45, "fat": 9.5, "sodium": 160}'
-            ),
-        },
-        {
-            "role": "user",
-            "content": (
                 f"For the meal description delimited by --- give your best estimate for calories, carbohydrates, protein, fat, sodium"
                 f" \n--- {food_description}  ---\n"
                 f" Only if the text describes food you can recognize, explain your calculation process, and then end the response by providing a JSON with your best estimate using keys: Calories, Carbohydrates, Protein, Fat and Sodium"

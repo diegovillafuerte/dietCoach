@@ -4,7 +4,6 @@ from datetime import date
 
 dbsession = create_connection()
 
-print(todays_meals(dbsession, 'diego.villafuerte.soraiz@gmail.com'))
 
 user1 = {
     'email': 'diego.villafuerte.soraiz@gmail.com',
@@ -38,8 +37,20 @@ user3 = {
     'weight_goal': 61,
     'gender': 'male'
 }
+
+user4 = {
+    'email': 'clehuede@mba2024.hbs.edu',
+    'name': 'Cristian Lehuede',
+    'password': '12345678',
+    'birthdate': '1994-10-10 00:00:00',
+    'weight': 65,
+    'height': 170,
+    'weight_goal': 61,
+    'gender': 'male'
+}
+
+add_user(dbsession, user4)
 '''
-add_user(dbsession, user1)
 add_user(dbsession, user2)
 new_user = add_user(dbsession, user3)
 print(f"Added user with email: {new_user}")'''
