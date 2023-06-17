@@ -2,8 +2,8 @@ import os
 import sys
 from flask import Flask, request, render_template, redirect, session, g, flash
 from .prompts import get_nutritional_info
-from datetime import datetime
-from .dbOperations import create_connection, close_connection, add_meals, get_daily_total, todays_meals, delete_meals
+from datetime import datetime, date
+from .dbOperations import create_connection, close_connection, add_meals, get_daily_total, list_of_days_meals, delete_meals
 from .dbOperations import DBSession, User, Meal
 from passlib.hash import pbkdf2_sha256
 
@@ -24,7 +24,7 @@ def login():
         password = request.form["password"]
         db_Session = DBSession()
         user = db_Session.query(User).filter_by(email=email).first()        
-        if user and pbkdf2_sha256.verify(password, user.password_hash):
+        if user and user.check_password(password):
             session['email'] = email
             return redirect('/welcome')
         else:
@@ -38,8 +38,8 @@ def welcome():
         return redirect('/login')
     else:
         user_email = session['email']
-        todaysMeals = todays_meals(g.conn, user_email)
-        dailyTotal = get_daily_total(g.conn, user_email)       
+        todaysMeals = list_of_days_meals(g.conn, user_email, date.today())
+        dailyTotal = get_daily_total(g.conn, user_email, date.today())       
         return render_template('welcome.html', email=user_email, today_meals = todaysMeals, dailyTotal=dailyTotal)
 
 @app.route("/get_info", methods=["POST"])
@@ -47,8 +47,8 @@ def get_info():
     food_description = request.form["food_description"]
     nutritional_info = get_nutritional_info(food_description)
     user_email = session['email']
-    todaysMeals = todays_meals(g.conn, user_email)
-    dailyTotal = get_daily_total(g.conn, user_email) 
+    todaysMeals = list_of_days_meals(g.conn, user_email, date.today())
+    dailyTotal = get_daily_total(g.conn, user_email, date.today()) 
     if nutritional_info['calories'] == 'error':
         flash("Error: Your query was not understood. Please try again.")
         return render_template('welcome.html', today_meals = todaysMeals, dailyTotal=dailyTotal, error="Error: Your query was not understood. Please try again.")
@@ -91,8 +91,8 @@ def add_meal():
 
     # Get todays meal summary
     user_email = session['email']
-    todaysMeals = todays_meals(g.conn, user_email)
-    dailyTotal = get_daily_total(g.conn, user_email) 
+    todaysMeals = list_of_days_meals(g.conn, user_email, date.today())
+    dailyTotal = get_daily_total(g.conn, user_email, date.today()) 
 
     # Redirect to welcome page
     return render_template('welcome.html', today_meals = todaysMeals, dailyTotal=dailyTotal)
@@ -113,8 +113,8 @@ def delete_Meal(meal_id):
     except ValueError as e:
         print(e) 
     user_email = session['email']
-    todaysMeals = todays_meals(g.conn, user_email)
-    dailyTotal = get_daily_total(g.conn, user_email)       
+    todaysMeals = list_of_days_meals(g.conn, user_email, date.today())
+    dailyTotal = get_daily_total(g.conn, user_email, date.today())       
     return render_template('welcome.html', email=user_email, today_meals = todaysMeals, dailyTotal=dailyTotal)
 
     
