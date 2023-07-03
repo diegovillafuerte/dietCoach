@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, DateTime, Foreign
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os
 from passlib.hash import pbkdf2_sha256
-from datetime import date
+from datetime import date, timedelta
 
 # Manage Database Connection
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -80,8 +80,7 @@ def add_meals(meal):
         session.add(new_meal)
         session.commit()
 
-    # Return the ID of the newly added meal.
-    return new_meal.id
+
 
 def delete_meals(meal_id):
     """
@@ -170,6 +169,36 @@ def get_daily_total(user_email, day):
             }
     return total_dic
 
+def get_meals_and_totals_last_Ndays(user_email, time_period):
+    """
+    Returns a dictionary containing the total nutritional values and a list of meals for the specified user for the last three months.
+
+    Args:
+        DBSession: A SQLAlchemy session object.
+        user_email (str): The email address of the user.
+
+    Returns:
+        A dictionary where each key is a date from the last three months and each value is a dictionary containing:
+            - 'totals': A dictionary of the total nutritional values for all meals for the specified date and user.
+            - 'meals': A list of dictionaries representing the meals for the specified user on the specified date.
+    """
+    meals_and_totals = []
+
+    for i in range(time_period-1, -1, -1): 
+        day = date.today() - timedelta(days=i)
+        day_string = day.isoformat()
+
+        daily_totals = get_daily_total(user_email, day)
+        meals = list_of_days_meals(user_email, day)
+
+        meals_and_totals.append((day_string, {
+            'totals': daily_totals,
+            'meals': meals
+        }))
+
+    return meals_and_totals
+
+
 class User(Base):
     """
     A class representing a user in the database.
@@ -226,10 +255,12 @@ def get_user(email):
     try:
         user = session.query(User).filter_by(email=email).first()
         return user
+    except:
+        return None
     finally:
         session.close()
 
-def add_user(user):
+def add_user(email, password, name):
     """
     Adds a new user to the database.
 
@@ -238,30 +269,20 @@ def add_user(user):
             The dictionary must contain the following keys:
                 - 'email': The email address of the user (required).
                 - 'name': The name of the user (required).
-                - 'birthdate': The birthdate of the user (required).
-                - 'weight': The weight of the user in pounds (required).
-                - 'height': The height of the user in inches (required).
-                - 'weight_goal': The weight goal of the user in pounds (required).
-                - 'gender': The gender of the user ('M' or 'F', required).
-                - 'password': The password for the user (required).
 
     Returns:
         The email address of the newly created user.
     """
     new_user = User(
-        email=user['email'],
-        name=user['name'],
-        birthdate=user['birthdate'],
-        weight=user['weight'],
-        height=user['height'],
-        weight_goal=user['weight_goal'],
-        gender=user['gender']
+        email=email,
+        name=name
     )
-    new_user.set_password(user['password'])
+    new_user.set_password(password)
     with DBSession() as session:
         session.add(new_user)
         session.commit()
-    return new_user.email
+        email_x = new_user.email
+    return email_x
 
 def remove_user(email):
     """
